@@ -24,7 +24,7 @@
                 return (pnode->next == pnode);                          \
         }                                                               \
                                                                         \
-        static void node_##TYPENAME##_insert_after(                     \
+        static void node_##TYPENAME##_add_after(                        \
                 node_##TYPENAME * posi, ELEMTYPE e)                     \
         {                                                               \
                 node_##TYPENAME * node =                                \
@@ -36,7 +36,7 @@
                 node->prev->next = node;                                \
         }                                                               \
                                                                         \
-        static void node_##TYPENAME##_insert_before(                    \
+        static void node_##TYPENAME##_add_before(                       \
                 node_##TYPENAME * posi, ELEMTYPE e)                     \
         {                                                               \
                 node_##TYPENAME * node =                                \
@@ -60,7 +60,7 @@
         static void list_##TYPENAME##_push(                             \
                 node_##TYPENAME * phead, ELEMTYPE e)                    \
         {                                                               \
-                node_##TYPENAME##_insert_before(phead,e);               \
+                node_##TYPENAME##_add_before(phead,e);                  \
         }                                                               \
                                                                         \
         /* Delete the tail */                                           \
@@ -75,11 +75,12 @@
         static void list_##TYPENAME##_insert(                           \
                 node_##TYPENAME * phead, ELEMTYPE e)                    \
         {                                                               \
-                node_##TYPENAME##_insert_after(phead,e);                \
+                node_##TYPENAME##_add_after(phead,e);                   \
         }                                                               \
                                                                         \
         /* Delete the head */                                           \
-        static ELEMTYPE list_##TYPENAME##_drop(node_##TYPENAME * phead) \
+        static ELEMTYPE list_##TYPENAME##_delete(                       \
+                node_##TYPENAME * phead)                                \
         {                                                               \
                 ELEMTYPE tmp = phead->next->key;                        \
                 node_##TYPENAME##_delete(phead->next);                  \
@@ -91,10 +92,25 @@
                 node_##TYPENAME * iter, * ihdl;                         \
                 for(iter = (*pphead)->next; iter != (*pphead); )        \
                 {                                                       \
-                        ihdl = iter;                                    \
-                        iter = iter->next;                              \
-                        free(ihdl);                                     \
-                }                                                       \
+                ihdl = iter;                                            \
+                iter = iter->next;                                      \
+                free(ihdl);                                             \
+        }                                                               \
+                free(*pphead);                                          \
+                *pphead = NULL;                                         \
+        }                                                               \
+                                                                        \
+        static void list_##TYPENAME##_cleanup(                          \
+                node_##TYPENAME ** pphead, void (*cleanup)(ELEMTYPE *)) \
+        {                                                               \
+                node_##TYPENAME * iter, * ihdl;                         \
+                for(iter = (*pphead)->next; iter != (*pphead); )        \
+                {                                                       \
+                ihdl = iter;                                            \
+                iter = iter->next;                                      \
+                cleanup(&(ihdl->key));                                  \
+                free(ihdl);                                             \
+        }                                                               \
                 free(*pphead);                                          \
                 *pphead = NULL;                                         \
         }                                                               \
@@ -108,43 +124,43 @@
                 /* posi1 is pred of posi2 */                            \
                 else if(posi1->next == posi2)                           \
                 {                                                       \
-                        node_##TYPENAME * posi0 = posi1->prev;          \
-                        node_##TYPENAME * posi3 = posi2->next;          \
-                        posi0->next = posi2;                            \
-                        posi2->prev = posi0;                            \
-                        posi2->next = posi1;                            \
-                        posi1->prev = posi2;                            \
-                        posi1->next = posi3;                            \
-                        posi3->prev = posi1;                            \
-                }                                                       \
+                node_##TYPENAME * posi0 = posi1->prev;                  \
+                node_##TYPENAME * posi3 = posi2->next;                  \
+                posi0->next = posi2;                                    \
+                posi2->prev = posi0;                                    \
+                posi2->next = posi1;                                    \
+                posi1->prev = posi2;                                    \
+                posi1->next = posi3;                                    \
+                posi3->prev = posi1;                                    \
+        }                                                               \
                 /* posi1 is succ of posi2 */                            \
                 else if(posi1->prev == posi2)                           \
                 {                                                       \
-                        node_##TYPENAME * posi0 = posi2->prev;          \
-                        node_##TYPENAME * posi3 = posi1->next;          \
-                        posi0->next = posi1;                            \
-                        posi1->prev = posi0;                            \
-                        posi1->next = posi2;                            \
-                        posi2->prev = posi1;                            \
-                        posi2->next = posi3;                            \
-                        posi3->prev = posi2;                            \
-                }                                                       \
+                node_##TYPENAME * posi0 = posi2->prev;                  \
+                node_##TYPENAME * posi3 = posi1->next;                  \
+                posi0->next = posi1;                                    \
+                posi1->prev = posi0;                                    \
+                posi1->next = posi2;                                    \
+                posi2->prev = posi1;                                    \
+                posi2->next = posi3;                                    \
+                posi3->prev = posi2;                                    \
+        }                                                               \
                 /* general case */                                      \
                 else                                                    \
                 {                                                       \
-                        node_##TYPENAME * posia = posi1->prev;          \
-                        node_##TYPENAME * posib = posi1->next;          \
-                        node_##TYPENAME * posic = posi2->prev;          \
-                        node_##TYPENAME * posid = posi2->next;          \
-                        posia->next = posi2;                            \
-                        posi2->prev = posia;                            \
-                        posi2->next = posib;                            \
-                        posib->prev = posi2;                            \
-                        posic->next = posi1;                            \
-                        posi1->prev = posic;                            \
-                        posi1->next = posid;                            \
-                        posid->prev = posi1;                            \
-                }                                                       \
+                node_##TYPENAME * posia = posi1->prev;                  \
+                node_##TYPENAME * posib = posi1->next;                  \
+                node_##TYPENAME * posic = posi2->prev;                  \
+                node_##TYPENAME * posid = posi2->next;                  \
+                posia->next = posi2;                                    \
+                posi2->prev = posia;                                    \
+                posi2->next = posib;                                    \
+                posib->prev = posi2;                                    \
+                posic->next = posi1;                                    \
+                posi1->prev = posic;                                    \
+                posi1->next = posid;                                    \
+                posid->prev = posi1;                                    \
+        }                                                               \
         }                                                               \
                                                                         \
         static void node_##TYPENAME##_exchange(                         \
@@ -153,6 +169,23 @@
                 ELEMTYPE tmp = posi1->key;                              \
                 posi1->key   = posi2->key;                              \
                 posi2->key   = tmp;                                     \
+        }                                                               \
+                                                                        \
+        static void node_##TYPENAME##_drop(node_##TYPENAME * posi)      \
+        {                                                               \
+                                                                        \
+        }                                                               \
+                                                                        \
+        static void node_##TYPENAME##_insert_after(                     \
+                node_##TYPENAME * posi, node_##TYPENAME * new)          \
+        {                                                               \
+                                                                        \
+        }                                                               \
+                                                                        \
+        static void node_##TYPENAME##_insert_before(                    \
+                node_##TYPENAME * posi, node_##TYPENAME * new)          \
+        {                                                               \
+                                                                        \
         }                                                               \
                                                                         \
         /* Note that if the index overflows                             \
