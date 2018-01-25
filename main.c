@@ -15,6 +15,11 @@ vector_(intarray,int *)
 list_(int,int)
 list_(intarray,int *)
 
+#include "binarytree_template.h"
+#include "set_template.h"
+#include "map_template.h"
+#include "string_util.h"
+
 
 typedef struct
 {
@@ -105,13 +110,20 @@ int main()
         for(int i=0;i<iv.size;i++)
                 printf("%d\t",vector_int_(&iv,i));
         printf("\n");
+        printf("index = %d\n",vector_int_search(&iv, cmp, 0));
+        printf("index = %d\n",vector_int_search_interval(&iv, cmp, 0, iv.size-100, iv.size));
+        printf("index = %d\n",vector_int_locate_interval(&iv, cmp, 0, 0, iv.size));
+        printf("index = %d\n",vector_int_locate_interval(&iv, cmp, 0, iv.size - 200, iv.size));
+        printf("index = %d\n",vector_int_locate_late_interval(&iv, cmp, 0, 0, iv.size));
+        printf("index = %d\n",vector_int_locate_late_interval(&iv, cmp, 0, iv.size - 200, iv.size));
+
         vector_int_free(&iv);
 
         vector_int_init(&iv);
         printf("iv.size=%d\n",iv.size);
         printf("iv.cap =%d\n",iv.cap);
         for(int i=0;i<1000;i++)
-                vector_int_push(&iv, i % 19);
+                vector_int_push(&iv, i % 23);
         printf("iv.size=%d\n",iv.size);
         printf("iv.cap =%d\n",iv.cap);
         vector_int_shrink(&iv);
@@ -130,14 +142,33 @@ int main()
 
         vector_int v1;
         vector_int_init(&v1);
-        for(int i=0;i<100000;i++)
+        for(int i=0;i<1000000;i++)
                 vector_int_push(&v1, rand());
         printf("start\n");
         vector_int_quicksort(&v1, cmp, 0, v1.size);
-        for(int i=0;i<v1.size;i++)
-                printf("%d\t",vector_int_(&v1,i));
-        printf("\n");
+        //for(int i=0;i<v1.size;i++)
+        //        printf("%d\t",vector_int_(&v1,i));
+        //printf("\n");
         vector_int_free(&v1);
+
+        vector_int vnew;
+        vector_int_init(&vnew);
+        for(int i=0;i<20;i++)
+                vector_int_push(&vnew, i%5);
+        vector_int_quicksort(&vnew, cmp, 0, vnew.size);
+        for(int i=0;i<vnew.size;i++)
+                printf("%d\t",vector_int_(&vnew,i));
+        printf("\n");
+
+
+        printf("index = %d\n",vector_int_locate(&vnew, cmp, 200));
+        printf("index = %d\n",vector_int_locate_late(&vnew, cmp, 200));
+        vector_int_insert(&vnew, vector_int_locate_late(&vnew, cmp, 10) + 1, 10);
+        vector_int_insert(&vnew, vector_int_locate_late(&vnew, cmp, 1) + 1, 10);
+
+        for(int i=0;i<vnew.size;i++)
+                printf("%d\t",vector_int_(&vnew,i));
+        printf("\n");
 
         node_int * head;
         list_int_init(&head);
@@ -150,7 +181,7 @@ int main()
                 printf("%d\t",iter->key);
         printf("\n");
         printf("%d\n",list_int_pop(head));
-        printf("%d\n",list_int_drop(head));
+        printf("%d\n",list_int_delete(head));
         for(node_int * iter = list_int_begin(head);
             iter != list_int_end(head);
             iter = list_int_next(iter))
@@ -183,9 +214,24 @@ int main()
         vector_intarray vaa;
         vector_intarray_init(&vaa);
         for(int i=0;i<100;i++)
-                vector_intarray_push(&vaa, malloc(sizeof(int)*20));
+        {
+                int * p = malloc(sizeof(int) * 20);
+                memset(p, 0, sizeof(int) * 20);
+                vector_intarray_push(&vaa, p);
+        }
+        printf("\t==%d==\n",vector_intarray_(&vaa, 8)[10]);
         vector_intarray_cleanup(&vaa, intarray_cleanup);
 
+        vector_string buf;
+        char stra[200] = " adfaskf jfkladsjfa fkjadsjf \t\t\tkdafjaskka;sj\\kfasdj\nfsadf\t ";
+        string_split(stra,&buf);
+        for(char ** iter = vector_string_begin(&buf);
+            iter != vector_string_end(&buf);
+            iter =  vector_string_next(&buf, iter)) //alt: iter++
+        {
+                printf("%s\n", *iter);
+        }
+        vector_string_cleanup(&buf, string_util_cleanup);
 
         return 0;
 }

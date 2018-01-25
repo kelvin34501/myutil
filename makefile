@@ -1,12 +1,13 @@
 CC = clang
-CFLAGS = -O2 -Wall -Wno-unused
+CFLAGS = -g -O0 -Wall -Wno-unused
 
 module = main.o
+header = vector_template.h list_template.h binarytree_template.h set_template.h map_template.h string_util.h library.h
 
 all: $(module)
 	$(CC) $(CFLAGS) -o main $(module)
 
-main.o: main.c vector_template.h list_template.h library.h
+main.o: main.c $(header)
 	$(CC) $(CFLAGS) -c main.c
 
 .PHONY: clean clean-object

@@ -87,7 +87,8 @@
                 {                                                       \
                         vec->data[iter] = vec->data[iter - 1];          \
                 }                                                       \
-                *(vec->data + i) = e;                                   \
+                vec->size++;                                            \
+                vec->data[i] = e;                                       \
                 return;                                                 \
         }                                                               \
                                                                         \
@@ -154,6 +155,7 @@
                 vec->data = NULL;                                       \
         }                                                               \
                                                                         \
+        /* Sort Functions */                                            \
         static void vector_##TYPENAME##_merge(                          \
                 vector_##TYPENAME * vec, int (*cmp)(ELEMTYPE,ELEMTYPE), \
                 int lo, int mi, int hi)                                 \
@@ -187,7 +189,7 @@
         {                                                               \
                 if (hi - lo < 2)                                        \
                         return;                                         \
-                int mi = (hi + lo) / 2;                                 \
+                int mi = lo + (hi - lo) / 2;                            \
                 vector_##TYPENAME##_mergesort(vec, cmp, lo, mi);        \
                 vector_##TYPENAME##_mergesort(vec, cmp, mi, hi);        \
                 vector_##TYPENAME##_merge(vec, cmp, lo, mi, hi);        \
@@ -211,7 +213,151 @@
                 }                                                       \
                 vector_##TYPENAME##_quicksort(vec, cmp, lo, j-1);       \
                 vector_##TYPENAME##_quicksort(vec, cmp, j , hi );       \
+        }                                                               \
+                                                                        \
+        static int vector_##TYPENAME##_find(                            \
+                vector_##TYPENAME * vec, int (*cmp)(ELEMTYPE,ELEMTYPE), \
+                ELEMTYPE e)                                             \
+        {                                                               \
+                int i;                                                  \
+                for(i = 0; i < vec->size; i++)                          \
+                        if(cmp(vec->data[i],e))                         \
+                                return i;                               \
+                return -1;                                              \
+        }                                                               \
+                                                                        \
+        static int vector_##TYPENAME##_find_interval(                   \
+                vector_##TYPENAME * vec, int (*cmp)(ELEMTYPE,ELEMTYPE), \
+                ELEMTYPE e, int lo, int hi)                             \
+        {                                                               \
+                assert(0 <= lo && lo <= vec->size);                     \
+                assert(0 <= hi && hi <= vec->size);                     \
+                int i;                                                  \
+                for(i = lo; i < hi; i++)                                \
+                        if(cmp(vec->data[i], e) == 0)                   \
+                                return i;                               \
+                return -1;                                              \
+        }                                                               \
+                                                                        \
+        /* These 6 functions should only be used on sorted vectors. */  \
+        static int vector_##TYPENAME##_search(                          \
+                vector_##TYPENAME * vec, int (*cmp)(ELEMTYPE,ELEMTYPE), \
+                ELEMTYPE e)                                             \
+        {                                                               \
+                int lo = 0, hi = vec->size;                             \
+                int mi = lo + (hi - lo)/2;                              \
+                int fg = 0;                                             \
+                while(hi - lo > 0)                                      \
+                {                                                       \
+                        mi = lo + (hi - lo)/2;                          \
+                        fg = cmp(vec->data[mi],e);                      \
+                        if(fg == 0)                                     \
+                                return mi;                              \
+                        else if(fg < 0)                                 \
+                                lo = mi + 1;                            \
+                        else                                            \
+                                hi = mi;                                \
+                }                                                       \
+                return -1;                                              \
+                                                                        \
+        }                                                               \
+                                                                        \
+        static int vector_##TYPENAME##_search_interval(                 \
+                vector_##TYPENAME * vec, int (*cmp)(ELEMTYPE,ELEMTYPE), \
+                ELEMTYPE e, int lo, int hi)                             \
+        {                                                               \
+                int mi = lo + (hi - lo)/2;                              \
+                int fg = 0;                                             \
+                while(hi - lo > 0)                                      \
+                {                                                       \
+                        mi = lo + (hi - lo)/2;                          \
+                        fg = cmp(vec->data[mi],e);                      \
+                        if(fg == 0)                                     \
+                                return mi;                              \
+                        else if(fg < 0)                                 \
+                                lo = mi + 1;                            \
+                        else                                            \
+                                hi = mi;                                \
+                }                                                       \
+                return -1;                                              \
+        }                                                               \
+                                                                        \
+        /* _locate returns the first if element repeats*/               \
+        static int vector_##TYPENAME##_locate(                          \
+                vector_##TYPENAME * vec, int (*cmp)(ELEMTYPE,ELEMTYPE), \
+                ELEMTYPE e)                                             \
+        {                                                               \
+                int lo = 0, hi = vec->size;                             \
+                int mi = lo + (hi - lo)/2;                              \
+                int fg = 0;                                             \
+                while(hi - lo > 0)                                      \
+                {                                                       \
+                        mi = lo + (hi - lo)/2;                          \
+                        fg = cmp(vec->data[mi],e);                      \
+                        if(fg < 0)                                      \
+                                lo = mi + 1;                            \
+                        else                                            \
+                                hi = mi;                                \
+                }                                                       \
+                return mi;                                              \
+        }                                                               \
+                                                                        \
+        static int vector_##TYPENAME##_locate_interval(                 \
+                vector_##TYPENAME * vec, int (*cmp)(ELEMTYPE,ELEMTYPE), \
+                ELEMTYPE e, int lo, int hi)                             \
+        {                                                               \
+                int mi = lo + (hi - lo)/2;                              \
+                int fg = 0;                                             \
+                while(hi - lo > 0)                                      \
+                {                                                       \
+                        mi = lo + (hi - lo)/2;                          \
+                        fg = cmp(vec->data[mi],e);                      \
+                        if(fg < 0)                                      \
+                                lo = mi + 1;                            \
+                        else                                            \
+                                hi = mi;                                \
+                }                                                       \
+                return mi;                                              \
+        }                                                               \
+                                                                        \
+        /* _locate_late returns last if element repeats */              \
+        static int vector_##TYPENAME##_locate_late(                     \
+                vector_##TYPENAME * vec, int (*cmp)(ELEMTYPE,ELEMTYPE), \
+                ELEMTYPE e)                                             \
+        {                                                               \
+                int lo = 0, hi = vec->size;                             \
+                int mi = lo + (hi - lo)/2;                              \
+                int fg = 0;                                             \
+                while(hi - lo > 0)                                      \
+                {                                                       \
+                        mi = lo + (hi - lo)/2;                          \
+                        fg = cmp(vec->data[mi],e);                      \
+                        if(fg > 0)                                      \
+                                hi = mi;                                \
+                        else                                            \
+                                lo = mi + 1;                            \
+                }                                                       \
+                return mi;                                              \
+        }                                                               \
+                                                                        \
+        static int vector_##TYPENAME##_locate_late_interval(            \
+                vector_##TYPENAME * vec, int (*cmp)(ELEMTYPE,ELEMTYPE), \
+                ELEMTYPE e, int lo, int hi)                             \
+        {                                                               \
+                int mi = lo + (hi - lo)/2;                              \
+                int fg = 0;                                             \
+                while(hi - lo > 0)                                      \
+                {                                                       \
+                        mi = lo + (hi - lo)/2;                          \
+                        fg = cmp(vec->data[mi],e);                      \
+                        if(fg > 0)                                      \
+                                hi = mi;                                \
+                        else                                            \
+                                lo = mi + 1;                            \
+                }                                                       \
+                return mi;                                              \
         }
+
 
 
 #endif

@@ -66,6 +66,7 @@
         /* Delete the tail */                                           \
         static ELEMTYPE list_##TYPENAME##_pop(node_##TYPENAME * phead)  \
         {                                                               \
+                assert(phead->next != phead);                           \
                 ELEMTYPE tmp = phead->prev->key;                        \
                 node_##TYPENAME##_delete(phead->prev);                  \
                 return tmp;                                             \
@@ -82,6 +83,7 @@
         static ELEMTYPE list_##TYPENAME##_delete(                       \
                 node_##TYPENAME * phead)                                \
         {                                                               \
+                assert(phead->next != phead);                           \
                 ELEMTYPE tmp = phead->next->key;                        \
                 node_##TYPENAME##_delete(phead->next);                  \
                 return tmp;                                             \
@@ -173,19 +175,26 @@
                                                                         \
         static void node_##TYPENAME##_drop(node_##TYPENAME * posi)      \
         {                                                               \
-                                                                        \
+                posi->prev->next = posi->next;                          \
+                posi->next->prev = posi->prev;                          \
         }                                                               \
                                                                         \
         static void node_##TYPENAME##_insert_after(                     \
-                node_##TYPENAME * posi, node_##TYPENAME * new)          \
+                node_##TYPENAME * posi, node_##TYPENAME * node)         \
         {                                                               \
-                                                                        \
+                node->prev = posi;                                      \
+                node->next = posi->next;                                \
+                node->next->prev = node;                                \
+                node->prev->next = node;                                \
         }                                                               \
                                                                         \
         static void node_##TYPENAME##_insert_before(                    \
-                node_##TYPENAME * posi, node_##TYPENAME * new)          \
+                node_##TYPENAME * posi, node_##TYPENAME * node)         \
         {                                                               \
-                                                                        \
+                node->next = posi;                                      \
+                node->prev = posi->prev;                                \
+                node->prev->next = node;                                \
+                node->next->prev = node;                                \
         }                                                               \
                                                                         \
         /* Note that if the index overflows                             \
