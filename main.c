@@ -30,6 +30,7 @@ typedef struct
 } seta;
 
 vector_(seta,seta)
+list_(seta,seta)
 
 int cmp(int x, int y)
 {
@@ -181,14 +182,14 @@ int main()
                 printf("%d\t",iter->key);
         printf("\n");
         printf("%d\n",list_int_pop(head));
-        printf("%d\n",list_int_delete(head));
+        printf("%d\n",list_int_dequeue(head));
         for(node_int * iter = list_int_begin(head);
             iter != list_int_end(head);
             iter = list_int_next(iter))
                 printf("%d\t",iter->key);
         printf("\n");
         list_int_push(head, 99);
-        list_int_insert(head, 0);
+        list_int_enqueue(head, 0);
         for(node_int * iter = list_int_begin(head);
             iter != list_int_end(head);
             iter = list_int_next(iter))

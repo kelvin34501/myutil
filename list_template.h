@@ -73,14 +73,14 @@
         }                                                               \
                                                                         \
         /* Add to the head */                                           \
-        static void list_##TYPENAME##_insert(                           \
+        static void list_##TYPENAME##_enqueue(                          \
                 node_##TYPENAME * phead, ELEMTYPE e)                    \
         {                                                               \
                 node_##TYPENAME##_add_after(phead,e);                   \
         }                                                               \
                                                                         \
         /* Delete the head */                                           \
-        static ELEMTYPE list_##TYPENAME##_delete(                       \
+        static ELEMTYPE list_##TYPENAME##_dequeue(                      \
                 node_##TYPENAME * phead)                                \
         {                                                               \
                 assert(phead->next != phead);                           \
@@ -243,12 +243,13 @@
                 return posi->next;                                      \
         }                                                               \
                                                                         \
-        static node_##TYPENAME * list_##TYPENAME##_locate(              \
-                node_##TYPENAME * phead, ELEMTYPE e)                    \
+        static node_##TYPENAME * list_##TYPENAME##_find(                \
+                node_##TYPENAME * phead, int (*cmp)(ELEMTYPE,ELEMTYPE), \
+                ELEMTYPE e)                                             \
         {                                                               \
                 node_##TYPENAME * iter;                                 \
                 for(iter=phead->next; iter!=phead; iter=iter->next)     \
-                        if(iter->key == e)                              \
+                        if(cmp(iter->key,e) == 0)                       \
                                 return iter;                            \
                 return NULL;                                            \
         }

@@ -19,7 +19,16 @@
         {                                                               \
                 vec->size = 0;                                          \
                 vec->cap  = __MYUTIL_VECTOR_DEFAULT_CAP;                \
-                vec->data = malloc(sizeof(ELEMTYPE) * 8);               \
+                vec->data = malloc(sizeof(ELEMTYPE) *                   \
+                                   __MYUTIL_VECTOR_DEFAULT_CAP);        \
+        }                                                               \
+                                                                        \
+        static void vector_##TYPENAME##_init_n(vector_##TYPENAME * vec, \
+                                               int n)                   \
+        {                                                               \
+                vec->size = 0;                                          \
+                vec->cap  = n;                                          \
+                vec->data = malloc(sizeof(ELEMTYPE) * n);               \
         }                                                               \
                                                                         \
         static void vector_##TYPENAME##_free(vector_##TYPENAME * vec)   \
