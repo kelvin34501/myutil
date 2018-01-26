@@ -1,5 +1,5 @@
 CC = clang
-CFLAGS = -g -O0 -Wall -Wno-unused
+CFLAGS = -g -Wall -Wno-unused
 
 module = main.o
 header = vector_template.h list_template.h binarytree_template.h set_template.h map_template.h string_util.h library.h

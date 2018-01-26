@@ -16,6 +16,9 @@ list_(int,int)
 list_(intarray,int *)
 
 #include "binarytree_template.h"
+binarytree_(int,int)
+
+
 #include "set_template.h"
 #include "map_template.h"
 #include "string_util.h"
@@ -31,6 +34,7 @@ typedef struct
 
 vector_(seta,seta)
 list_(seta,seta)
+binarytree_(seta,seta)
 
 int cmp(int x, int y)
 {
@@ -50,6 +54,7 @@ void intarray_cleanup(int ** parray)
 
 int main()
 {
+/* stea test */
         seta a = {0,0,0,0.0};
         printf("%d,%d,%d,%lf\n", a.x, a.y , a.z , a.m);
         a.x = 1;
@@ -58,6 +63,7 @@ int main()
         printf("%d,%d,%d,%lf\n", a.x , a.y , a.z , a.m);
         printf("%d\n",a.z);
 
+/* inmd test */
         vector_int inmd;
         vector_int_init(&inmd);
         for(int i=0;i<100;i++)
@@ -88,6 +94,7 @@ int main()
 
         vector_int_free(&inmd);
 
+/* iset test */
         vector_seta iset;
         vector_seta_init(&iset);
         vector_seta_push(&iset, a);
@@ -95,10 +102,12 @@ int main()
         seta * psp = &sp;
         vector_seta_free(&iset);
 
+/* idbl test */
         vector_double idbl;
         vector_double_init(&idbl);
         vector_double_free(&idbl);
 
+/* iv sort/locate test */
         vector_int iv;
         vector_int_init(&iv);
         for(int i=0;i<1000;i++)
@@ -120,6 +129,7 @@ int main()
 
         vector_int_free(&iv);
 
+/* iv remove test */
         vector_int_init(&iv);
         printf("iv.size=%d\n",iv.size);
         printf("iv.cap =%d\n",iv.cap);
@@ -136,11 +146,13 @@ int main()
         printf("iv.cap =%d\n",iv.cap);
         vector_int_free(&iv);
 
-        int k=8, kk = 10;
+/* swap test */
+       int k=8, kk = 10;
         printf("%d %d\n",k,kk);
         swap(k,kk);
         printf("%d %d\n",k,kk);
 
+/* v1 sort preformance test */
         vector_int v1;
         vector_int_init(&v1);
         for(int i=0;i<1000000;i++)
@@ -152,6 +164,7 @@ int main()
         //printf("\n");
         vector_int_free(&v1);
 
+/* vnew locate test */
         vector_int vnew;
         vector_int_init(&vnew);
         for(int i=0;i<20;i++)
@@ -160,7 +173,6 @@ int main()
         for(int i=0;i<vnew.size;i++)
                 printf("%d\t",vector_int_(&vnew,i));
         printf("\n");
-
 
         printf("index = %d\n",vector_int_locate(&vnew, cmp, 200));
         printf("index = %d\n",vector_int_locate_late(&vnew, cmp, 200));
@@ -171,6 +183,9 @@ int main()
                 printf("%d\t",vector_int_(&vnew,i));
         printf("\n");
 
+        vector_int_free(&vnew);
+
+/* list tests */
         node_int * head;
         list_int_init(&head);
         printf("empty = %d\n", list_int_empty(head));
@@ -223,6 +238,7 @@ int main()
         printf("\t==%d==\n",vector_intarray_(&vaa, 8)[10]);
         vector_intarray_cleanup(&vaa, intarray_cleanup);
 
+/* string util tests */
         vector_string buf;
         char stra[200] = " adfaskf jfkladsjfa fkjadsjf \t\t\tkdafjaskka;sj\\kfasdj\nfsadf\t ";
         string_split(stra,&buf);
@@ -233,6 +249,12 @@ int main()
                 printf("%s\n", *iter);
         }
         vector_string_cleanup(&buf, string_util_cleanup);
+
+/* binary tests */
+        binarytree_int tree;
+        binarytree_int_init(&tree);
+        binarytree_int_insert(&tree, cmp, 1);
+        binarytree_int_insert(&tree, cmp, 2);
 
         return 0;
 }

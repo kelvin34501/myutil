@@ -204,6 +204,14 @@
                 vector_##TYPENAME##_merge(vec, cmp, lo, mi, hi);        \
         }                                                               \
                                                                         \
+        static void vector_##TYPENAME##_swap(                           \
+                vector_##TYPENAME * vec, int i1, int i2)                \
+        {                                                               \
+                ELEMTYPE tmp  = vec->data[i1];                          \
+                vec->data[i1] = vec->data[i2];                          \
+                vec->data[i2] = tmp;                                    \
+        }                                                               \
+                                                                        \
         static void vector_##TYPENAME##_quicksort(                      \
                 vector_##TYPENAME * vec, int (*cmp)(ELEMTYPE,ELEMTYPE), \
                 int lo, int hi)                                         \
@@ -211,12 +219,14 @@
                 if (hi - lo < 2)                                        \
                         return;                                         \
                 int r = (rand() % (hi - lo)) + lo;                      \
+                /*vector_##TYPENAME##_swap(vec,r,hi-1);*/               \
                 swap(vec->data[r],vec->data[hi-1]);                     \
                 int i, j=lo;                                            \
                 for(i=lo; i<hi; i++)                                    \
                 {                                                       \
                         if(cmp(vec->data[i],vec->data[hi-1]) <= 0)      \
                         {                                               \
+                                /*vector_##TYPENAME##_swap(vec,i,j++);*/ \
                                 swap(vec->data[i],vec->data[j++]);      \
                         }                                               \
                 }                                                       \
