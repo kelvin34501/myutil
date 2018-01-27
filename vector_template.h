@@ -207,6 +207,8 @@
         static void vector_##TYPENAME##_swap(                           \
                 vector_##TYPENAME * vec, int i1, int i2)                \
         {                                                               \
+                if(i1 == i2)                                            \
+                        return;                                         \
                 ELEMTYPE tmp  = vec->data[i1];                          \
                 vec->data[i1] = vec->data[i2];                          \
                 vec->data[i2] = tmp;                                    \
