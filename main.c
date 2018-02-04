@@ -52,6 +52,11 @@ void intarray_cleanup(int ** parray)
         *parray = NULL;
 }
 
+void print_p_int(int * p)
+{
+        printf("%d  ",*p);
+}
+
 int main()
 {
 /* stea test */
@@ -185,8 +190,8 @@ int main()
 
         vector_int_free(&vnew);
 
-/* list tests */
-        node_int * head;
+/* list basic tests */
+        list_int head;
         list_int_init(&head);
         printf("empty = %d\n", list_int_empty(head));
         for(int i=0; i<100; i++)
@@ -197,33 +202,62 @@ int main()
                 printf("%d\t",iter->key);
         printf("\n");
         printf("%d\n",list_int_pop(head));
-        printf("%d\n",list_int_dequeue(head));
+        printf("%d\n",list_int_delete(head));
         for(node_int * iter = list_int_begin(head);
             iter != list_int_end(head);
             iter = list_int_next(iter))
                 printf("%d\t",iter->key);
         printf("\n");
         list_int_push(head, 99);
-        list_int_enqueue(head, 0);
+        list_int_insert(head, 0);
         for(node_int * iter = list_int_begin(head);
             iter != list_int_end(head);
             iter = list_int_next(iter))
                 printf("%d\t",iter->key);
         printf("\n");
-        node_int * p1 = head->next;
-        node_int * p2 = head->next->next->next;
-        node_int_exchange(p1,p2);
-        //node_int_swap(head, p2);
+        node_int * p1 = head->next->next;
+        node_int * p2 = head->next;
+        //node_int_exchange(p1,p2);
+        node_int_swap(p1, p2);
 
         for(node_int * iter = list_int_begin(head);
             iter != list_int_end(head);
             iter = list_int_next(iter))
+                printf("%d\t",iter->key);
+        printf("\n");
+        for(node_int * iter = list_int_end(head)->prev;
+            iter != list_int_begin(head)->prev;
+            iter = list_int_prev(iter))
                 printf("%d\t",iter->key);
         printf("\n");
 
         list_int_free(&head);
 
-        node_intarray * list2;
+/* list sort test */
+        printf("\n\n\n");
+
+        list_int l1;
+        list_int_init(&l1);
+        for(int i=0;i<20;i++)
+                list_int_push(l1, rand()%3);
+        for(node_int * iter = list_int_begin(l1);
+            iter != list_int_end(l1);
+            iter = list_int_next(iter))
+                printf("%d\t",iter->key);
+        printf("\n");
+        list_int_quicksort(cmp, list_int_begin(l1), list_int_end(l1));
+        printf("\n");
+        for(node_int * iter = list_int_begin(l1);
+            iter != list_int_end(l1);
+            iter = list_int_next(iter))
+                printf("%d\t",iter->key);
+        printf("\n");
+        list_int_free(&l1);
+
+
+/* cleanup tests */
+        printf("\n\n\n");
+        list_intarray list2;
         list_intarray_init(&list2);
         list_intarray_free(&list2);
 
@@ -253,8 +287,16 @@ int main()
 /* binary tests */
         binarytree_int tree;
         binarytree_int_init(&tree);
-        binarytree_int_insert(&tree, cmp, 1);
-        binarytree_int_insert(&tree, cmp, 2);
-
+        for(int i=0;i<20;i++)
+                binarytree_int_insert(&tree, cmp, rand()%100);
+        binarytree_int_traverse_preorder(tree, print_p_int);
+        printf("\n");
+        binarytree_int_traverse_inorder(tree, print_p_int);
+        printf("\n");
+        binarytree_int_traverse_postorder(tree, print_p_int);
+        printf("\n");
+        binarytree_int_traverse_hierarchy(tree, print_p_int);
+        printf("\n");
+        binarytree_int_free(&tree);
         return 0;
 }

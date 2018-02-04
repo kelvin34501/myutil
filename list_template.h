@@ -6,6 +6,7 @@
 
 #define list_(TYPENAME,ELEMTYPE)                                        \
         typedef struct _node_##TYPENAME node_##TYPENAME;                \
+        typedef node_##TYPENAME * list_##TYPENAME;                      \
         struct _node_##TYPENAME {                                       \
                 ELEMTYPE key;                                           \
                 node_##TYPENAME * prev;                                 \
@@ -73,14 +74,14 @@
         }                                                               \
                                                                         \
         /* Add to the head */                                           \
-        static void list_##TYPENAME##_enqueue(                          \
+        static void list_##TYPENAME##_insert(                           \
                 node_##TYPENAME * phead, ELEMTYPE e)                    \
         {                                                               \
                 node_##TYPENAME##_add_after(phead,e);                   \
         }                                                               \
                                                                         \
         /* Delete the head */                                           \
-        static ELEMTYPE list_##TYPENAME##_dequeue(                      \
+        static ELEMTYPE list_##TYPENAME##_delete(                       \
                 node_##TYPENAME * phead)                                \
         {                                                               \
                 assert(phead->next != phead);                           \
@@ -252,6 +253,29 @@
                         if(cmp(iter->key,e) == 0)                       \
                                 return iter;                            \
                 return NULL;                                            \
+        }                                                               \
+                                                                        \
+        /* this version of sort uses node-exchange, which copies the    \
+         * key of the node, therefore may not be efficient.             \
+         */                                                             \
+        static void list_##TYPENAME##_quicksort(                        \
+                int (*cmp)(ELEMTYPE,ELEMTYPE),                          \
+                node_##TYPENAME * pbegin, node_##TYPENAME * pend)       \
+        {                                                               \
+                if(pbegin == pend || pbegin->next == pend)              \
+                        return;                                         \
+                node_##TYPENAME * i;                                    \
+                node_##TYPENAME * j=pbegin;                             \
+                for(i=pbegin; i!=pend; i=i->next)                       \
+                {                                                       \
+                        if(cmp(i->key,pend->prev->key) <= 0)            \
+                        {                                               \
+                                node_##TYPENAME##_exchange(i,j);        \
+                                j=j->next;                              \
+                        }                                               \
+                }                                                       \
+                list_##TYPENAME##_quicksort(cmp, pbegin, j->prev);      \
+                list_##TYPENAME##_quicksort(cmp, j , pend );            \
         }
 
 
