@@ -24,11 +24,13 @@
         }                                                               \
                                                                         \
         static void vector_##TYPENAME##_init_n(vector_##TYPENAME * vec, \
-                                               int n)                   \
+                                               int n, ELEMTYPE e)       \
         {                                                               \
-                vec->size = 0;                                          \
-                vec->cap  = n;                                          \
-                vec->data = malloc(sizeof(ELEMTYPE) * n);               \
+                vec->size = n;                                          \
+                vec->cap  = n * 2;                                      \
+                vec->data = malloc(sizeof(ELEMTYPE) * n * 2);           \
+                for(int i = 0; i < n; i++)                              \
+                        vec->data[i] = e;                               \
         }                                                               \
                                                                         \
         static void vector_##TYPENAME##_free(vector_##TYPENAME * vec)   \

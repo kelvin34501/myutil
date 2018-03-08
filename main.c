@@ -23,7 +23,6 @@ binarytree_(int,int)
 #include "map_template.h"
 #include "string_util.h"
 
-
 typedef struct
 {
         int x;
@@ -57,9 +56,12 @@ void print_p_int(int * p)
         printf("%d  ",*p);
 }
 
-int main()
+
+#include "graph.h"
+
+int test_fn()
 {
-/* stea test */
+        /* stea test */
         seta a = {0,0,0,0.0};
         printf("%d,%d,%d,%lf\n", a.x, a.y , a.z , a.m);
         a.x = 1;
@@ -298,5 +300,40 @@ int main()
         binarytree_int_traverse_hierarchy(tree, print_p_int);
         printf("\n");
         binarytree_int_free(&tree);
+
+/* graph tests */
+        graph_debug();
+
         return 0;
+}
+
+#include "pthread.h"
+typedef struct thread_fn_param thread_fn_param;
+struct thread_fn_param {
+        int i;
+};
+
+void * thread_fn(void * i)
+{
+        int tid;
+
+        tid = ((thread_fn_param *) i) -> i;
+
+        printf("Hello World! It's me, thread #%d!\n", tid); 
+
+        pthread_exit(NULL);
+}
+
+int main()
+{
+        //test_fn();
+/* pthread tests */
+        pthread_t t[10];
+        thread_fn_param tmp[10];
+        for(int i = 0; i < 10; i++)
+        {
+                tmp[i].i = i;
+                pthread_create(&t[i], NULL, thread_fn, &tmp[i]);
+        }
+        pthread_exit(NULL);
 }

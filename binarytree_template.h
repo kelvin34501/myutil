@@ -123,14 +123,14 @@
         binarytree_##TYPENAME##_pred(binarytree_node_##TYPENAME * root, \
                                      binarytree_node_##TYPENAME * posi) \
         {                                                               \
-                                                                        \
+                return NULL;                                            \
         }                                                               \
                                                                         \
         static binarytree_node_##TYPENAME *                             \
         binarytree_##TYPENAME##_succ(binarytree_node_##TYPENAME * root, \
                                      binarytree_node_##TYPENAME * posi) \
         {                                                               \
-                                                                        \
+                return NULL;                                            \
         }                                                               \
                                                                         \
         static void binarytree_##TYPENAME##_delete(                     \
